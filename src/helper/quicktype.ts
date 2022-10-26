@@ -1,10 +1,10 @@
 import {
     InputData,
     jsonInputForTargetLanguage,
-    quicktype, TargetLanguage
+    quicktype, TargetLanguage, Options
 } from "quicktype-core";
 
-async function quicktypeJSON(targetLanguage: string | TargetLanguage, typeName: string, jsonString: string) {
+async function quicktypeJSON(targetLanguage: string | TargetLanguage, typeName: string, jsonString: string, options: Partial<Options> = {}) {
     const jsonInput = jsonInputForTargetLanguage(targetLanguage);
 
     // We could add multiple samples for the same desired
@@ -21,6 +21,7 @@ async function quicktypeJSON(targetLanguage: string | TargetLanguage, typeName: 
     return await quicktype({
         inputData,
         lang: targetLanguage,
+        ...options
     });
 }
 
