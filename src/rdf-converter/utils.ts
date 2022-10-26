@@ -1,7 +1,6 @@
-import datasetFactory from "@rdfjs/dataset";
-import {DatasetCore, Literal, NamedNode, Quad} from "@rdfjs/types";
+import {BlankNode, DatasetCore, Literal, NamedNode, Quad, Quad_Object, Quad_Subject} from "@rdfjs/types";
 import df from "@rdfjs/data-model";
-import {rdf, xsd} from "@tpluscode/rdf-ns-builders";
+import {rdf, rdfs, xsd} from "@tpluscode/rdf-ns-builders";
 import {makeClassNode, makeEntityNode, makePropertyNode} from "./vocabulary";
 import {PredicateObjectPair, PropertyList} from "./types";
 import {filterUndefOrNull} from "../helper/notEmpty";
@@ -28,7 +27,8 @@ export async function all<T>(promises?: Promise<T>[]) {
 }
 
 export function createRDFGraphFromRaw(type: string, uid: number, data: any, keysThatShouldBeUrl?: string[]): { subjectNode: NamedNode, graph: Quad[] } {
-    const subject = makeEntityNode(type, uid)
+    const subject = makeEntityNode(type, uid),
+        classNode = makeClassNode(type)
     return {
         subjectNode: subject, graph: [
             ...filterUndefOrNull(Object.entries(data).map(([key, value]) => {
@@ -40,7 +40,8 @@ export function createRDFGraphFromRaw(type: string, uid: number, data: any, keys
                 }
                 return null
             })),
-            df.quad(subject, rdf.type, makeClassNode(type))
+            df.quad<Quad>(subject, rdf.type, classNode),
+            df.quad<Quad>(classNode, rdf.type, rdfs.Class)
         ]
     }
 }
@@ -65,6 +66,12 @@ export function addEdgeWithReifiedProperties(edge: Quad, predicateObjectList: Pr
 
 }
 
-export function addDefaultSimpleEdge(subjectNode: NamedNode, key: string, id: number, dataset: DatasetCore<Quad>) {
-    dataset.add(df.quad(subjectNode, makePropertyNode('key'), makeEntityNode('key', id)))
+export function addDefaultSimpleEdge(subjectNode: NamedNode | BlankNode, key: string, id: number, dataset: DatasetCore<Quad>) {
+    dataset.add(df.quad(subjectNode, makePropertyNode(key), makeEntityNode(key, id)))
 }
+
+export function addNamedSimpleEdge(subjectNode: NamedNode | BlankNode, name: string, key: string, id: number, dataset: DatasetCore<Quad>) {
+    dataset.add(df.quad(subjectNode, makePropertyNode(name), makeEntityNode(key, id)))
+}
+
+
