@@ -2,10 +2,10 @@ import df from "@rdfjs/data-model";
 import {capitalize} from "lodash";
 import {rdf, rdfs, xsd} from "@tpluscode/rdf-ns-builders";
 
-const baseURI = "http://onlogies.slub-dresden.de/musiconn.preformance/"
-const entityIRI = `${baseURI}entity#`
-const classIRI = `${baseURI}class#`
-const propsIRI = `${baseURI}props#`
+export const baseURI = "http://ontologies.slub-dresden.de/musiconn.performance/"
+export const entityIRI = `${baseURI}entity#`
+export const classIRI = `${baseURI}class#`
+export const propsIRI = `${baseURI}props#`
 
 export function makePropertyNode(key: string) {
     return df.namedNode(`${propsIRI}${key}`)
