@@ -1,11 +1,15 @@
 import {BlankNode, DatasetCore, Literal, NamedNode, Quad, Quad_Object, Quad_Subject} from "@rdfjs/types";
 import df from "@rdfjs/data-model";
-import {rdf, rdfs, xsd} from "@tpluscode/rdf-ns-builders";
+import {geo, rdf, rdfs, xsd} from "@tpluscode/rdf-ns-builders";
 import {makeClassNode, makeEntityNode, makePropertyNode} from "./vocabulary";
 import {PredicateObjectPair, PropertyList} from "./types";
 import {filterUndefOrNull} from "../helper/notEmpty";
 import clownface from "clownface";
 import * as RdfStatement from "@rdfine/rdf/lib/Statement";
+import {createHash, randomUUID} from "crypto";
+import {turtle} from "@tpluscode/rdf-string";
+import N3 from "n3";
+import {hashQuad} from "../helper/quadHashes";
 
 /**
  * convert any JS primitive value to RDF Literal
@@ -21,6 +25,16 @@ export function toLiteral(value: any): Literal {
     else
         throw new Error(`Cannot convert ${value} to RDF Literal`)
 }
+
+const geoLiteralIRI = 'http://wwww.bigdata.com/rdf/geospatial/literals/v1#'
+export function toGeoLiteral(geo: [number, number]) {
+    return df.literal(`${geo[0]}#${geo[1]}` , df.namedNode(geoLiteralIRI + 'lat-lon'))
+}
+
+export function toWKTLiteral(coords: [number, number]) {
+    return df.literal(`POINT(${coords[0]} ${coords[1]})`, geo.wktLiteral)
+}
+
 
 export async function all<T>(promises?: Promise<T>[]) {
     return promises ? await Promise.all(promises) : []
@@ -52,17 +66,19 @@ export function propertyListToPredicateObjectList(propertyList: PropertyList): P
 }
 
 export function addEdgeWithReifiedProperties(edge: Quad, predicateObjectList: PredicateObjectPair[], dataset: DatasetCore<Quad>) {
-    const bn = clownface({dataset}).blankNode()
-    const reifiedNode = RdfStatement.fromPointer(bn, {
+    const statementPointer = clownface({dataset}).namedNode(makeEntityNode('statement', hashQuad(edge)))
+    const reifiedNode = RdfStatement.fromPointer(statementPointer, {
         types: [rdf.Statement],
         subject: edge.subject,
         predicate: edge.predicate,
         object: edge.object
     })
+    dataset.add(df.quad(edge.subject, df.namedNode(edge.predicate.value.replace('props#', 'statement-props#')), reifiedNode.id))
+    dataset.add(df.quad(reifiedNode.id, rdf.type, makeClassNode('Statement')))
     predicateObjectList
         .map(([predicate, object]) => df.quad(reifiedNode.id, predicate, object))
         .forEach(q => dataset.add(q))
-    return bn.term
+    return statementPointer.term
 
 }
 

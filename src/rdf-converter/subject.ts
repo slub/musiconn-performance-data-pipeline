@@ -22,14 +22,14 @@ type SubjectP = Subject['_source']
  */
 
 export function subjectToRDF(subjectProps: SubjectP, dataset: DatasetCore<Quad>) {
-    const subject = makeEntityNode('subject', subjectProps.uid),
+    const subjectNode = makeEntityNode('subject', subjectProps.uid),
         subjectType = makePropertyNode('subject')
 
     subjectProps.names.forEach(({name, order, language}) => {
         if(order === 1) {
-            dataset.add(df.quad(subject, rdfs.label, df.literal(name, language)))
+            dataset.add(df.quad(subjectNode, rdfs.label, df.literal(name, language)))
         }
-        const reifiedStatement = addEdgeWithReifiedProperties(df.quad(subject, makePropertyNode('name'), df.literal(name, language)), propertyListToPredicateObjectList({}), dataset)
+        const reifiedStatement = addEdgeWithReifiedProperties(df.quad(subjectNode, makePropertyNode('name'), df.literal(name, language)), propertyListToPredicateObjectList({}), dataset)
         dataset.add(df.quad(reifiedStatement, makePropertyNode('order'), df.literal(order.toString(), xsd.integer)))
 
     })
@@ -50,40 +50,40 @@ export function subjectToRDF(subjectProps: SubjectP, dataset: DatasetCore<Quad>)
     serials?:      Serial[];
      */
     subjectProps.authorities?.forEach(authority => {
-        addDefaultSimpleEdge(subject, 'authority', authority.authority, dataset)
+        addDefaultSimpleEdge(subjectNode, 'authority', authority.authority, dataset)
     })
 
     subjectProps.projects.forEach(project => {
-        addDefaultSimpleEdge(subject, 'project', project.project, dataset)
+        addDefaultSimpleEdge(subjectNode, 'project', project.project, dataset)
     })
 
     subjectProps.persons?.forEach(person => {
-        addDefaultSimpleEdge(subject, 'person', person.person, dataset)
+        addDefaultSimpleEdge(subjectNode, 'person', person.person, dataset)
 
     })
 
     subjectProps.parents?.forEach(parent => {
-        addNamedSimpleEdge(subject, 'parent', 'subject', parent.subject, dataset)
+        addNamedSimpleEdge(subjectNode, 'parent', 'subject', parent.subject, dataset)
     })
 
     subjectProps.childs?.forEach(child => {
-        addNamedSimpleEdge(subject, 'child', 'subject', child.subject, dataset)
+        addNamedSimpleEdge(subjectNode, 'child', 'subject', child.subject, dataset)
     })
 
     subjectProps.events?.forEach(event => {
-        addNamedSimpleEdge(subject, 'event', 'event', event.event, dataset)
+        addNamedSimpleEdge(subjectNode, 'event', 'event', event.event, dataset)
     })
 
     subjectProps.corporations?.forEach(corporation => {
-        addNamedSimpleEdge(subject, 'corporation', 'corporation', corporation.corporation, dataset)
+        addNamedSimpleEdge(subjectNode, 'corporation', 'corporation', corporation.corporation, dataset)
     })
     subjectProps.serials?.forEach(serial => {
-        addNamedSimpleEdge(subject, 'serial', 'serial', serial.series, dataset)
+        addNamedSimpleEdge(subjectNode, 'serial', 'serial', serial.series, dataset)
     })
 
     subjectProps.performances?.forEach(performance => {
-        addNamedSimpleEdge(subject, 'performance', 'person', performance.person, dataset)
+        addNamedSimpleEdge(subjectNode, 'performance', 'person', performance.person, dataset)
     })
     createRDFGraphFromRaw('subject', subjectProps.uid, subjectProps).graph.forEach(quad => dataset.add(quad))
-
+    return subjectNode.value
 }

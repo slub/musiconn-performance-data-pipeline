@@ -1,6 +1,6 @@
 import df from "@rdfjs/data-model";
 import {capitalize} from "lodash";
-import {rdf, rdfs, xsd} from "@tpluscode/rdf-ns-builders";
+import {geo, rdf, rdfs, xsd, sf} from "@tpluscode/rdf-ns-builders";
 
 export const baseURI = "http://ontologies.slub-dresden.de/musiconn.performance/"
 export const entityIRI = `${baseURI}entity#`
@@ -11,8 +11,8 @@ export function makePropertyNode(key: string) {
     return df.namedNode(`${propsIRI}${key}`)
 }
 
-export function makeEntityNode(type: string, uid: number) {
-    return df.namedNode(`${entityIRI}${type}_${uid}`)
+export function makeEntityNode(type: string, uid: number | string) {
+    return df.namedNode(`${entityIRI}${type}_${uid.toString()}`)
 }
 
 export function makeClassNode(type: string) {
@@ -20,6 +20,8 @@ export function makeClassNode(type: string) {
 }
 
 export const prefixes = {
+    geo: geo[''],
+    sf: sf[''],
     rdf: rdf[''],
     rdfs: rdfs[''],
     xsd: xsd[''],

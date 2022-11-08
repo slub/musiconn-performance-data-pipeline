@@ -18,10 +18,10 @@ export function eventsSourceGalleryToRdf(gallery: Gallery) {
 
 export type EventS = Event["_source"]
 
-export async function eventToRDF(eventProps: EventS, dataset: DatasetCore<Quad>) {
+export function eventToRDF(eventProps: EventS, dataset: DatasetCore<Quad>): `${string}${string}_${string}`  {
     const type = 'event',
         subjectNode = makeEntityNode(type, eventProps.uid)
-    if (!eventProps) return []
+    if (!eventProps) throw new Error('no eventProps')
 
     eventProps.persons?.forEach(p => {
         addEdgeWithReifiedProperties(df.quad(subjectNode, makePropertyNode('person'), makeEntityNode('person', p.person)),
@@ -51,7 +51,7 @@ export async function eventToRDF(eventProps: EventS, dataset: DatasetCore<Quad>)
             galleryGraph.forEach(q => dataset.add(q))
         })
     })
-    eventProps.names.forEach(({name, order, subtitle, language, label}) => {
+    eventProps.names?.forEach(({name, order, subtitle, language, label}) => {
         if (!name) return
         if (order === 1) {
             dataset.add(
@@ -67,19 +67,16 @@ export async function eventToRDF(eventProps: EventS, dataset: DatasetCore<Quad>)
             }), dataset)
     })
     eventProps.performances?.forEach(({work, order, composers, corporations, descriptions}) => {
-        const performanceNode = df.blankNode()
-        propertyListToPredicateObjectList({
-            work: makeEntityNode('work', work),
+        const workNode = makeEntityNode('work', work)
+        const reifiedNode = addEdgeWithReifiedProperties(df.quad(subjectNode, makePropertyNode('performance'), workNode), propertyListToPredicateObjectList({
             order: df.literal(order.toString(), xsd.integer)
-        })
-            .forEach(([predicate, object]) => dataset.add(df.quad(performanceNode, predicate, object)))
+        }), dataset)
         composers?.map(({person}) => makeEntityNode('person', person))
-            .forEach(objectNode => dataset.add(df.quad(performanceNode, makePropertyNode('composer'), objectNode)))
+            .forEach(objectNode => dataset.add(df.quad(reifiedNode, makePropertyNode('composer'), objectNode)))
         corporations?.map(({corporation}) => makeEntityNode('corporation', corporation))
-            .forEach(objectNode => dataset.add(df.quad(performanceNode, makePropertyNode('corporation'), objectNode)))
+            .forEach(objectNode => dataset.add(df.quad(reifiedNode, makePropertyNode('corporation'), objectNode)))
         descriptions?.map(({description}) => df.literal(description))
-            .forEach(objectNode => dataset.add(df.quad(performanceNode, makePropertyNode('description'), objectNode)))
-        dataset.add(df.quad(subjectNode, makePropertyNode('performance'), performanceNode))
+            .forEach(objectNode => dataset.add(df.quad(reifiedNode, makePropertyNode('description'), objectNode)))
     })
     eventProps.dates?.forEach(({date}) => {
         dataset.add(df.quad(subjectNode, makePropertyNode('date'), df.literal(date, xsd.date)))
@@ -88,4 +85,5 @@ export async function eventToRDF(eventProps: EventS, dataset: DatasetCore<Quad>)
         dataset.add(df.quad(subjectNode, makePropertyNode('time'), df.literal(time, xsd.time)))
     })
     createRDFGraphFromRaw('event', eventProps.uid, eventProps).graph.forEach(q => dataset.add(q))
+    return subjectNode.value
 }

@@ -92,5 +92,6 @@ export function personToRDF(personProps: PersonS, dataset: DatasetCore<Quad>) {
         })
     })
     createRDFGraphFromRaw('person', personProps.uid, personProps, [] ).graph.forEach(quad => dataset.add(quad))
+    return subjectNode.value
 }
 

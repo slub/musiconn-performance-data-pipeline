@@ -68,4 +68,5 @@ export function workToRDF(workProps: WorkS, dataset: DatasetCore<Quad>) {
         addNamedSimpleEdge(subjectNode, 'libretist', 'person', l.person, dataset)
     })
     createRDFGraphFromRaw('work',workProps.uid,  workProps).graph.forEach(quad => dataset.add(quad))
+    return subjectNode.value
 }

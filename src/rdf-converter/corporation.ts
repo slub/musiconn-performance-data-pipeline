@@ -84,5 +84,5 @@ export function corporationToRDF(corporationProps: CorporationS, dataset: Datase
     })
 
     createRDFGraphFromRaw('corporation', corporationProps.uid, corporationProps).graph.forEach(q => dataset.add(q))
-
+    return subjectNode.value
 }
