@@ -1,15 +1,19 @@
 musiconn.performance - schemata
 ===
 
-This is a collection of schemata for the Musiconn.performance catalog project.
+This is a collection of schemata for the [Musiconn Performance](https://performance.musiconn.de/) catalog project.
 Its purpose is to provide a common vocabulary for describing
 musical performances. It can be bootstraped from the elastic search
-index of the Musiconn.perfomance database (as of 2022).
+index of the Musiconn.perfomance database (as of november 2022).
 
-## Data processing pipeline
-
+## Dumping the database
 
 Assumes elasticsearch to be running on `localhost:9200`.
+
+If you want to use localhost for a remote ES instance, you need to
+set up a tunnel to the remote host:
+
+    ssh user@example.de -L 9200:localhost:9200 -N
 
 1. get all indices
 
@@ -59,7 +63,7 @@ npm run build:types
  npm run build:graph
  ```
 
-## Data Pipeline
+## Dataprocessing Pipeline
 
 The stream processor takes the json data dump transforms them into RDF as intermediate
 format and creates Cypher statements, that can be streamed directly to a neo4j database.
@@ -68,4 +72,28 @@ you could stream it to a neo4j instance
 
 ```shell
 npm run build:neo4j
+```
+
+## reproducable build environment using nix
+
+### on Linux ans MacOSX with nix installed
+
+on any system, where the nix package manager is installed with experimental flake support
+turned on, you can just run
+
+```shell
+nix develop
+```
+
+### other OSs and Linux without nix installed
+
+you can use a docker image containing the nix package manager to build the project
+or get a development environment with all dependencies installed.
+
+```shell
+docker run  -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$(pwd):/app" \
+            -it -w /app --rm \
+            nixos/nix \
+            bash -c "nix develop -L --extra-experimental-features nix-command --extra-experimental-features flakes --no-sandbox"
 ```
