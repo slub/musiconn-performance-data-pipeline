@@ -1,27 +1,12 @@
-import * as fs from "fs";
-import quicktypeJSON from "./helper/quicktype";
+import {INDICES} from "./context";
+import {quicktypeFromFile} from "./helper/quicktypeIO";
 
-export async function buildRustTypes() {
-
-    const INDICES = ["date", "subject", "work", "corporation", "source", "series", "person", "authority", "location", "event"]
-
-    INDICES.map(async (typeName: string) => {
-        const jsonString = fs.readFileSync(`./data/${typeName}_data_pretty.json`)
-
-        const {lines} = await quicktypeJSON(
-            "rust",
-            typeName,
-            jsonString.toString(), {
-                rendererOptions: {
-                    visibility: "public"
-                }
-            }
-        );
-        fs.writeFileSync(`./data/rust/${typeName}_schema.rs`, lines.join('\n'))
-
-    })
-
-}
-
+const buildRustTypes = async () => INDICES.map(async (typeName: string) =>
+    await quicktypeFromFile('rust', typeName, {
+        fileExtension: 'rs',
+        rendererOptions: {
+            visibility: "public"
+        }
+    }));
 
 buildRustTypes();

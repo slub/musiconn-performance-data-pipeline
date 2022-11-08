@@ -3,6 +3,9 @@ import * as Person from "./types/person";
 import * as Work from "./types/work";
 import * as Corporation from "./types/corporation";
 import * as Subject from "./types/subject";
+import * as Series from "./types/series";
+import * as Source from "./types/source";
+import * as Location from "./types/location";
 import {Quad} from "@rdfjs/types";
 import N3 from "n3";
 import * as fs from "fs";
@@ -16,6 +19,9 @@ import {subjectToRDF} from "./rdf-converter/subject";
 import {eventToRDF} from "./rdf-converter/event";
 import * as cli from "@asgerf/strongcli";
 import {TypeType} from "./helper/basic";
+import {seriesToRDF} from "./rdf-converter/series";
+import {locationToRDF} from "./rdf-converter/location";
+import {sourceToRDF} from "./rdf-converter/source";
 
 interface Options {
     outputDir: string
@@ -128,6 +134,39 @@ async function convertFromFile(type: TypeType) {
                             subjectToRDF(s, dataset)
                         })
                     break
+                case "series":
+                    convertToRDF<Series.Series>(
+                        type,
+                        Series.Convert.toSeries,
+                        ({_source: s}) => s.names?.[0]?.name || s.uid.toString(),
+                        ({_source: s}) => {
+                            if (!s) return
+                            seriesToRDF(s, dataset)
+                        }
+                    )
+                    break
+                case "location":
+                    convertToRDF<Location.Location>(
+                        type,
+                        Location.Convert.toLocation,
+                        ({_source: l}) => l.names?.[0]?.name || l.uid.toString(),
+                        ({_source: l}) => {
+                            if (!l) return
+                            locationToRDF(l, dataset)
+                        }
+                    )
+                    break
+                case "source":
+                    convertToRDF<Source.Source>(
+                        type,
+                        Source.Convert.toSource,
+                        ({_source: s}) => s.names?.[0]?.name || s.uid.toString(),
+                        ({_source: s}) => {
+                            if (!s) return
+                            sourceToRDF(s, dataset)
+                        }
+
+                    )
                 default:
                     throw new Error(`Unknown type ${type}`)
             }
@@ -138,7 +177,7 @@ async function convertFromFile(type: TypeType) {
                 outputStream = fs.createWriteStream(outFileName),
                 writer = new N3.Writer(outputStream)
             writer.addPrefixes(prefixes)
-            writer.addQuads([...dataset.match(null, null, null)])
+            writer.addQuads([...dataset])
             writer.end(async (error, result) => {
                 //console.log(result)
                 outputStream.end()

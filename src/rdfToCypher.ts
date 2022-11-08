@@ -49,7 +49,7 @@ export function allInstancesOfClassToCypherStatements(classIRI: string, prefixes
     let subjectIndex = 0
     for (const {subject} of Array.from(dataset.match(null, rdf.type, df.namedNode(classIRI))))  //.forEach(({subject}, subjectIndex) => )
     {
-        if(subject.termType !== 'NamedNode') continue
+        if (subject.termType !== 'NamedNode') continue
         if (subjectIndex >= limit) break
 
         const neo4jType = iriToPrefixed(classIRI, prefixes)?.[1] ?? classIRI
