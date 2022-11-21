@@ -1,6 +1,6 @@
 {
-  "name": "@slub/musiconn-performance-elastic-pipeline",
-  "description": "musiconn.performance data transformation pipeline utilities",
+  "name": "@slub/musiconn-performance-data-pipeline",
+  "description": "musiconn.performance data transformation pipelines and utilities",
   "version": "1.0.0",
   "scripts": {
     "test": "jest",
@@ -26,7 +26,8 @@
     "build:cypher:work": "ts-node ./src/rdfToCypher.ts -o ./data/cypher -t work -i ./data/rdf/work.ttl",
     "build:cypher:series": "ts-node ./src/rdfToCypher.ts -o ./data/cypher -t series -i ./data/rdf/series.ttl",
     "pipeline:dump2neo4j": "ts-node ./src/dumpToNeo4j.ts",
-    "fix:rdf": "sh ./scripts/fix_ttl_files.sh ./data/rdf ./data/fixed"
+    "fix:rdf": "sh ./scripts/fix_ttl_files.sh ./data/rdf ./data/fixed",
+    "lint": "eslint . --ext .ts"
   },
   "author": "Sebastian Tilsch <sebastian-tilsch@slub-dresden.de>",
   "license": "MIT",
@@ -55,9 +56,6 @@
     "ws": "^8.10.0"
   },
   "devDependencies": {
-    "quicktype": "^15.1.0",
-    "quicktype-core": "^6.1.0",
-    "typeconv": "^1.8.0",
     "@types/clownface": "^1.5.1",
     "@types/express": "^4.17.14",
     "@types/highland": "^2.12.14",
@@ -71,12 +69,22 @@
     "@types/rdfjs__data-model": "^2.0.1",
     "@types/rdfjs__dataset": "^2.0.0",
     "@types/ws": "^8.5.3",
+    "@typescript-eslint/eslint-plugin": "5.42.1",
+    "@typescript-eslint/parser": "5.42.1",
     "concurrently": "^7.5.0",
     "cross-env": "^7.0.3",
+    "eslint": "8.27.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-jest": "27.1.4",
+    "eslint-plugin-simple-import-sort": "8.0.0",
     "jest": "^29.2.2",
+    "prettier": "2.7.1",
+    "quicktype": "^15.1.0",
+    "quicktype-core": "^6.1.0",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
+    "typeconv": "^1.8.0",
     "typescript": "^4.8.4"
   }
 }
