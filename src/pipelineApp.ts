@@ -1,9 +1,10 @@
-import express from 'express';
-import ws from 'ws';
-import {Stream} from "stream";
-import {runPipeline} from "./fromEleasticToRDF";
 import {turtle} from "@tpluscode/rdf-string";
+import express from 'express';
+import {Stream} from "stream";
 import {Readable} from "stronger-typed-streams";
+import ws from 'ws';
+
+import {runPipeline} from "./fromEleasticToRDF";
 
 const app = express();
 
@@ -14,13 +15,13 @@ wsServer.on('connection', websocket => {
     console.log('⚡️ websocket connection established. Listening...')
 
     websocket.on('message', async (message) => {
-        const incomming = message.toString()
+        const incoming = message.toString()
         console.log(`📥 Incomming message: "${message.toString()}"`);
 
-        switch (incomming) {
+        switch (incoming) {
             case 'start': {
                 console.log('will start pipeline')
-                const { readable, pipeline} = await runPipeline((o) => {
+                const res = await runPipeline((o) => {
                     //console.log(o)
                     websocket.send(JSON.stringify(o))
                 }, (ds) => {
@@ -30,6 +31,7 @@ wsServer.on('connection', websocket => {
                     }))
                 })
                 console.log('will set events pipeline')
+                pipeline = res.pipeline
                 pipeline.on('end', () => {
                     websocket.send(JSON.stringify({message: 'end'}))
                 })

@@ -1,15 +1,16 @@
-import {DatasetCore, Quad} from "@rdfjs/types";
-import {makeEntityNode, makePropertyNode} from "./vocabulary";
 import df from "@rdfjs/data-model";
+import {DatasetCore, Quad} from "@rdfjs/types";
 import {rdfs, xsd} from "@tpluscode/rdf-ns-builders";
+import dayjs from "dayjs";
+
+import {Series} from "../types/series";
 import {
     addDefaultSimpleEdge,
     addEdgeWithReifiedProperties,
     addNamedSimpleEdge, createRDFGraphFromRaw,
     propertyListToPredicateObjectList
 } from "./utils";
-import {Series} from "../types/series";
-import dayjs from "dayjs";
+import {makeEntityNode, makePropertyNode} from "./vocabulary";
 
 export type SeriesS = Series["_source"]
 

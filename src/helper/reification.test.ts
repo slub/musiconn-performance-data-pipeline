@@ -1,7 +1,8 @@
+import df from "@rdfjs/data-model";
 import datasetFactory from "@rdfjs/dataset";
 import N3 from "n3";
+
 import {getReifiedStatementTerms} from "./reification";
-import df from "@rdfjs/data-model";
 
 const fixtureTTL = `
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.

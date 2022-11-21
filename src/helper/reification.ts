@@ -1,7 +1,7 @@
-import {DatasetCore, Quad} from "@rdfjs/types";
-import * as RDF from "rdf-js";
-import {rdf} from "@tpluscode/rdf-ns-builders";
 import df from "@rdfjs/data-model";
+import {DatasetCore, Quad} from "@rdfjs/types";
+import {rdf} from "@tpluscode/rdf-ns-builders";
+import * as RDF from "rdf-js";
 
 export function getReifiedStatementTerms(quad: Quad, dataset: DatasetCore<Quad>): RDF.Term[] {
     const {subject, predicate, object} = quad

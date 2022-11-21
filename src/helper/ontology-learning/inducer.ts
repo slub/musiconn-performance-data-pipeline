@@ -4,11 +4,12 @@
  * 2. for each entity of each class, iterate through all properties
  * 3. add a rdfs:range and rdfs:domain to the property to the dataset
  */
+import df from "@rdfjs/data-model";
 import {DatasetCore, Quad} from "@rdfjs/types";
-import {baseURI} from "../../rdf-converter/vocabulary";
 import {rdf, rdfs} from "@tpluscode/rdf-ns-builders";
 import ProgressBar from "ascii-progress";
-import df from "@rdfjs/data-model";
+
+import {baseURI} from "../../rdf-converter/vocabulary";
 
 export function induceOntology(dataset: DatasetCore<Quad>) {
     const classes = dataset.match(null, rdf.type, null)

@@ -1,27 +1,28 @@
-import * as Event from "./types/event";
-import * as Person from "./types/person";
-import * as Work from "./types/work";
+import * as cli from "@asgerf/strongcli";
+import datasetFactory from '@rdfjs/dataset'
+import {Quad} from "@rdfjs/types";
+import ProgressBar from "ascii-progress";
+import * as fs from "fs";
+import N3 from "n3";
+
+import {TypeType} from "./helper/basic";
+import {corporationToRDF} from "./rdf-converter/corporation";
+import {eventToRDF} from "./rdf-converter/event";
+import {locationToRDF} from "./rdf-converter/location";
+import {personToRDF} from "./rdf-converter/person";
+import {seriesToRDF} from "./rdf-converter/series";
+import {sourceToRDF} from "./rdf-converter/source";
+import {subjectToRDF} from "./rdf-converter/subject";
+import {prefixes} from "./rdf-converter/vocabulary";
+import {workToRDF} from "./rdf-converter/work";
 import * as Corporation from "./types/corporation";
-import * as Subject from "./types/subject";
+import * as Event from "./types/event";
+import * as Location from "./types/location";
+import * as Person from "./types/person";
 import * as Series from "./types/series";
 import * as Source from "./types/source";
-import * as Location from "./types/location";
-import {Quad} from "@rdfjs/types";
-import N3 from "n3";
-import * as fs from "fs";
-import datasetFactory from '@rdfjs/dataset'
-import {prefixes} from "./rdf-converter/vocabulary";
-import ProgressBar from "ascii-progress";
-import {personToRDF} from "./rdf-converter/person";
-import {workToRDF} from "./rdf-converter/work";
-import {corporationToRDF} from "./rdf-converter/corporation";
-import {subjectToRDF} from "./rdf-converter/subject";
-import {eventToRDF} from "./rdf-converter/event";
-import * as cli from "@asgerf/strongcli";
-import {TypeType} from "./helper/basic";
-import {seriesToRDF} from "./rdf-converter/series";
-import {locationToRDF} from "./rdf-converter/location";
-import {sourceToRDF} from "./rdf-converter/source";
+import * as Subject from "./types/subject";
+import * as Work from "./types/work";
 
 interface Options {
     outputDir: string
@@ -29,7 +30,7 @@ interface Options {
     type: TypeType
 }
 
-const { options, args } = cli.main<Options>({
+const { options } = cli.main<Options>({
     outputDir: {
         value: String,
         alias: '-o',
@@ -51,9 +52,9 @@ const {outputDir, inputDir, type} = options
 
 let dataset = datasetFactory.dataset<Quad>([])
 
-type ConverterFunction<T> = (json: string) => T[]
-type ToRDFFunction<T> = (entity: T) => void
-type GetLabelFUnction<T> = (entity: T) => string
+type ConverterFunction<T> = (_json: string) => T[]
+type ToRDFFunction<T> = (_entity: T) => void
+type GetLabelFUnction<T> = (_entity: T) => string
 
 /**
  * Converts a JSON file to RDF and writes it to a file
@@ -167,6 +168,7 @@ async function convertFromFile(type: TypeType) {
                         }
 
                     )
+                    break;
                 default:
                     throw new Error(`Unknown type ${type}`)
             }
@@ -178,8 +180,10 @@ async function convertFromFile(type: TypeType) {
                 writer = new N3.Writer(outputStream)
             writer.addPrefixes(prefixes)
             writer.addQuads([...dataset])
-            writer.end(async (error, result) => {
-                //console.log(result)
+            writer.end(async (error) => {
+                if(error) {
+                    return reject(error)
+                }
                 outputStream.end()
                 dataset = datasetFactory.dataset<Quad>([])
                 resolve(null)

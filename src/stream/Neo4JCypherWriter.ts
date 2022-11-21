@@ -1,9 +1,10 @@
-import {Writable} from "stronger-typed-streams";
 import {DatasetCore} from "@rdfjs/types";
-import neo4j, {Session} from "neo4j-driver";
 import {Prefixes} from "n3";
-import {iriToPrefixed} from "../helper/iri";
+import neo4j, {Session} from "neo4j-driver";
+import {Writable} from "stronger-typed-streams";
+
 import {allInstancesOfClassToNeo4j} from "../cypher-converter/allInstancesOfClassToNeo4J";
+import {iriToPrefixed} from "../helper/iri";
 
 export class Neo4JCypherWriter extends Writable<DatasetCore> {
     private session: Session | undefined
@@ -22,13 +23,13 @@ export class Neo4JCypherWriter extends Writable<DatasetCore> {
         this.shouldTestExistence = shouldTestExistence
     }
 
-    _write(dataset: DatasetCore, encoding: BufferEncoding, callback: Function) {
+    _write(dataset: DatasetCore, encoding: BufferEncoding, callback: () => void) {
         process.nextTick(() => {
             //console.log(turtle`${dataset}`.toString())
             if(!this.session || !this.classIRI || !this.neo4jType) {
                 return
             }
-            allInstancesOfClassToNeo4j(this.classIRI!, this.prefixes, dataset, this.session, this.shouldTestExistence)
+            allInstancesOfClassToNeo4j(this.classIRI, this.prefixes, dataset, this.session, this.shouldTestExistence)
                 .then(() => callback())
         })
     }

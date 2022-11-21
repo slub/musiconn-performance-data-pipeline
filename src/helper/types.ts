@@ -1,5 +1,5 @@
+import {DatasetCore} from "@rdfjs/types";
 import {Progress} from "progress-stream";
-import {DatasetCore, Quad} from "@rdfjs/types";
 
 export type ObservableStatus = {
     index?: string,
@@ -9,10 +9,10 @@ export type ObservableStatus = {
 }
 export type ObservableOptions = {
     index?: string,
-    log?: (observerStatus: ObservableStatus) => void
+    log?: (_observerStatus: ObservableStatus) => void
 }
 
 export type PointedNode = {
     subjectIRI: string,
-    dataset: DatasetCore<Quad>
+    dataset: DatasetCore
 }

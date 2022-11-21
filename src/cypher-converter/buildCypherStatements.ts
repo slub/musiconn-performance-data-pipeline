@@ -1,12 +1,13 @@
 import df from "@rdfjs/data-model";
 import {DatasetCore, Quad} from "@rdfjs/types";
-import {geo, rdf, xsd} from "@tpluscode/rdf-ns-builders";
-import * as RDF from "rdf-js";
-import {Prefixes} from "n3";
-import {filterUndefOrNull} from "../helper/notEmpty";
+import {geo, xsd} from "@tpluscode/rdf-ns-builders";
 import {flatten} from "lodash";
-import {getReifiedStatementTerms} from "../helper/reification";
+import {Prefixes} from "n3";
+import * as RDF from "rdf-js";
+
 import {iriToPrefixed} from "../helper/iri";
+import {filterUndefOrNull} from "../helper/notEmpty";
+import {getReifiedStatementTerms} from "../helper/reification";
 
 
 function rdfLiteralToNeo4JLiteral(literal: RDF.Literal): string {

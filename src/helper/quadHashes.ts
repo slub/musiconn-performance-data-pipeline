@@ -1,6 +1,6 @@
 import {Quad} from "@rdfjs/types";
-import N3 from "n3";
 import {createHash} from "crypto";
+import N3 from "n3";
 
 /**
  * Creates a sha256 hash from a quad

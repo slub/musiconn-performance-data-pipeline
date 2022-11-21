@@ -1,8 +1,8 @@
-import {Writable} from "stronger-typed-streams";
 import {DatasetCore} from "@rdfjs/types";
-import N3, {Prefixes} from "n3";
 import {sparql} from "@tpluscode/rdf-string";
 import fetch from 'isomorphic-unfetch'
+import N3, {Prefixes} from "n3";
+import {Writable} from "stronger-typed-streams";
 
 export function prefixesToSPARQL(prefixes: Prefixes<string>): string {
     return Object.entries(prefixes).map(([prefix, iri]) => `PREFIX ${prefix}: <${iri}>`).join('\n')
@@ -29,7 +29,7 @@ export class SparqlUpdateWriter extends Writable<DatasetCore> {
         this.prefixes = prefixes
     }
 
-    _write(dataset: DatasetCore, encoding: BufferEncoding, callback: Function) {
+    _write(dataset: DatasetCore, encoding: BufferEncoding, callback: () => void) {
         process.nextTick(async () => {
            //console.log(turtle`${dataset}`.toString())
            const query = quadsToSPARQLUpdate(dataset, this.prefixes)

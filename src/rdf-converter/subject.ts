@@ -1,14 +1,15 @@
-import {DatasetCore, Quad} from "@rdfjs/types";
-import {makeEntityNode, makePropertyNode} from "./vocabulary";
 import df from "@rdfjs/data-model";
+import {DatasetCore, Quad} from "@rdfjs/types";
 import {rdfs, xsd} from "@tpluscode/rdf-ns-builders";
+
+import {Subject} from "../types/subject";
 import {
     addDefaultSimpleEdge,
     addEdgeWithReifiedProperties,
     addNamedSimpleEdge, createRDFGraphFromRaw,
     propertyListToPredicateObjectList
 } from "./utils";
-import {Subject} from "../types/subject";
+import {makeEntityNode, makePropertyNode} from "./vocabulary";
 
 
 type SubjectP = Subject['_source']
@@ -22,8 +23,7 @@ type SubjectP = Subject['_source']
  */
 
 export function subjectToRDF(subjectProps: SubjectP, dataset: DatasetCore<Quad>) {
-    const subjectNode = makeEntityNode('subject', subjectProps.uid),
-        subjectType = makePropertyNode('subject')
+    const subjectNode = makeEntityNode('subject', subjectProps.uid)
 
     subjectProps.names.forEach(({name, order, language}) => {
         if(order === 1) {
@@ -34,21 +34,6 @@ export function subjectToRDF(subjectProps: SubjectP, dataset: DatasetCore<Quad>)
 
     })
 
-    /*
-    repeat the same for other properties:
-
-    authorities?:  Authority[];
-    categories:    Category[];
-    projects:      Project[];
-    persons?:      Person[];
-    parents?:      SourceParent[];
-    performances?: Performance[];
-    descriptions?: Description[];
-    childs?:       SourceChild[];
-    events?:       Event[];
-    corporations?: Corporation[];
-    serials?:      Serial[];
-     */
     subjectProps.authorities?.forEach(authority => {
         addDefaultSimpleEdge(subjectNode, 'authority', authority.authority, dataset)
     })

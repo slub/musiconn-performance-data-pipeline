@@ -1,8 +1,8 @@
 import {
     InputData,
     jsonInputForTargetLanguage,
-    quicktype, TargetLanguage, Options
-} from "quicktype-core";
+Options,
+    quicktype, TargetLanguage} from "quicktype-core";
 
 async function quicktypeJSON(targetLanguage: string | TargetLanguage, typeName: string, jsonString: string, options: Partial<Options> = {}) {
     const jsonInput = jsonInputForTargetLanguage(targetLanguage);

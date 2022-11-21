@@ -1,16 +1,17 @@
 import * as cli from "@asgerf/strongcli";
-import {TypeType} from "./helper/basic";
+import df from "@rdfjs/data-model";
+import datasetFactory from "@rdfjs/dataset";
+import {DatasetCore, Quad} from "@rdfjs/types";
+import {rdf} from "@tpluscode/rdf-ns-builders";
 import * as fs from "fs";
 import N3, {Prefixes} from "n3";
-import {makeClassNode, prefixes} from "./rdf-converter/vocabulary";
+
 import {
     rdfNodeToCypherStatement
 } from "./cypher-converter/buildCypherStatements";
-import datasetFactory from "@rdfjs/dataset";
+import {TypeType} from "./helper/basic";
 import {iriToPrefixed} from "./helper/iri";
-import {rdf} from "@tpluscode/rdf-ns-builders";
-import df from "@rdfjs/data-model";
-import {DatasetCore, Quad} from "@rdfjs/types";
+import {makeClassNode, prefixes} from "./rdf-converter/vocabulary";
 
 interface Options {
     outputDir: string
@@ -18,7 +19,7 @@ interface Options {
     type: TypeType
 }
 
-const {options, args} = cli.main<Options>({
+const {options} = cli.main<Options>({
     outputDir: {
         value: String,
         alias: '-o',

@@ -1,11 +1,11 @@
-import {DatasetCore, Quad} from "@rdfjs/types";
-import {Transform} from "stronger-typed-streams";
-import {Prefixes} from "n3";
-import {TransformCallback} from "stream";
 import df from "@rdfjs/data-model";
 import {rdf} from "@tpluscode/rdf-ns-builders";
-import {iriToPrefixed} from "../helper/iri";
+import {Prefixes} from "n3";
+import {TransformCallback} from "stream";
+import {Transform} from "stronger-typed-streams";
+
 import {rdfNodeToCypherStatement} from "../cypher-converter/buildCypherStatements";
+import {iriToPrefixed} from "../helper/iri";
 import {PointedNode} from "../helper/types";
 
 

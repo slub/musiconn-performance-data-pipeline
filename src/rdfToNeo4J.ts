@@ -1,11 +1,12 @@
 import * as cli from "@asgerf/strongcli";
-import {TypeType} from "./helper/basic";
+import datasetFactory from "@rdfjs/dataset";
 import * as fs from "fs";
 import N3, {Prefixes} from "n3";
-import {classIRI, entityIRI, makeClassNode, propsIRI} from "./rdf-converter/vocabulary";
-import datasetFactory from "@rdfjs/dataset";
 import neo4j from "neo4j-driver";
+
 import {allInstancesOfClassToNeo4j} from "./cypher-converter/allInstancesOfClassToNeo4J";
+import {TypeType} from "./helper/basic";
+import {classIRI, entityIRI, makeClassNode, propsIRI} from "./rdf-converter/vocabulary";
 
 interface Options {
     database: string
@@ -13,7 +14,7 @@ interface Options {
     type: TypeType
 }
 
-const {options, args} = cli.main<Options>({
+const {options} = cli.main<Options>({
     database: {
         value: String,
         alias: '-d',

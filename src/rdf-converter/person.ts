@@ -1,15 +1,15 @@
+import df from "@rdfjs/data-model";
+import {DatasetCore, Quad} from "@rdfjs/types";
+import {rdfs, xsd} from "@tpluscode/rdf-ns-builders";
+
 import {Person} from "../types/person";
 import {
     addDefaultSimpleEdge,
     addEdgeWithReifiedProperties, addNamedSimpleEdge,
     createRDFGraphFromRaw,
-    propertyListToPredicateObjectList,
-    toLiteral
+    propertyListToPredicateObjectList
 } from "./utils";
-import {DatasetCore, Quad} from "@rdfjs/types";
 import {makeEntityNode, makePropertyNode} from "./vocabulary";
-import df from "@rdfjs/data-model";
-import {rdfs, xsd} from "@tpluscode/rdf-ns-builders";
 
 export type PersonS = Person["_source"]
 

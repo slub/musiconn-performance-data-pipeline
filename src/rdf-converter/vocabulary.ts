@@ -1,6 +1,6 @@
 import df from "@rdfjs/data-model";
+import {geo, rdf, rdfs, sf,xsd} from "@tpluscode/rdf-ns-builders";
 import {capitalize} from "lodash";
-import {geo, rdf, rdfs, xsd, sf} from "@tpluscode/rdf-ns-builders";
 
 export const baseURI = "http://ontologies.slub-dresden.de/musiconn.performance/"
 export const entityIRI = `${baseURI}entity#`

@@ -1,69 +1,22 @@
 import {Client} from '@elastic/elasticsearch'
-import progress from "progress-stream"
-import {Event} from "./types/event";
 import {SearchHit} from "@elastic/elasticsearch/lib/api/types";
 import {DatasetCore} from "@rdfjs/types";
-import {Prefixes} from "n3";
-import {
-    classIRI,
-    entityIRI,
-    makeClassNode,
-    propsIRI
-} from "./rdf-converter/vocabulary";
-import {eventToRDF} from "./rdf-converter/event";
+import progress from "progress-stream"
 import {Readable, Writable} from "stronger-typed-streams";
+
 import {TypeType} from "./helper/basic";
-import {SparqlUpdateWriter} from "./stream/SparqlUpdateWriter";
 import {ObservableOptions, ObservableStatus, PointedNode} from './helper/types';
+import {eventToRDF} from "./rdf-converter/event";
 import {EntityToRDFTransform} from "./stream/EntityToRDFTransform";
+import {Event} from "./types/event";
 
-
-const client = new Client({node: 'http://localhost:9200'})
-
-async function getHits<T extends SearchHit>(index: string, id: number) {
-    const result = await client.search<T["_source"]>({
-        index,
-        query: {
-            match: {"uid": id}
-        }
-    })
-    return result.hits.hits
-}
-
-
-/**
- * get all ids from an index
- * @param index - elastic search index
- */
-async function getAllIds(index: string): Promise<string[]> {
-    const allHits = [],
-        scroll = '20s'
-    let { _scroll_id, hits} = await client.search({
-        index,
-        scroll,
-        query: {
-            match_all: {}
-        },
-        "stored_fields": []
-    })
-    while (hits && hits.hits.length) {
-        allHits.push(... hits.hits.map(hit => hit._id))
-        const res = await client.scroll({scroll_id: _scroll_id, scroll})
-        _scroll_id = res._scroll_id
-        hits = res.hits
-    }
-    return allHits
-}
 
 class EntityReader<T extends SearchHit> extends Readable<T["_source"]> {
-    private i: number = 0
-    private scroll: string = '10s'
+    private scroll = '10s'
     private scroll_id: string | undefined
-    private options: ObservableOptions = {}
 
-    constructor(type: TypeType, opts: ObservableOptions) {
-        super({objectMode: true, ...opts});
-        this.options = opts
+    constructor(type: TypeType, private readonly options: ObservableOptions, private readonly client: Client) {
+        super({objectMode: true, ...options});
         try {
             client.search<T["_source"]>({
                 index: type,
@@ -82,11 +35,11 @@ class EntityReader<T extends SearchHit> extends Readable<T["_source"]> {
             console.error(e)
         }
     }
-    _read(size: number) {
+    _read() {
         const { scroll_id, scroll } = this
         if(!scroll_id) return
         try {
-            client.scroll({scroll_id, scroll}).then(({_scroll_id, hits}) => {
+            this.client.scroll({scroll_id, scroll}).then(({_scroll_id, hits}) => {
                 this.scroll_id = _scroll_id
                 process.nextTick(() => {
                     this.options.log?.({index: this.options.index, count: hits.hits?.length ?? 0, message: 'scroll'})
@@ -102,13 +55,11 @@ class EntityReader<T extends SearchHit> extends Readable<T["_source"]> {
 
 
 class Logger extends Writable<PointedNode> {
-    private logCallback: (ds: DatasetCore) => void | undefined
-    constructor(logCallback: (ds: DatasetCore) => void) {
+    constructor(private readonly  logCallback: (ds: DatasetCore) => void) {
         super({objectMode: true})
-        this.logCallback = logCallback
     }
 
-    _write({dataset}: PointedNode, encoding: BufferEncoding, callback: Function) {
+    _write({dataset}: PointedNode, encoding: BufferEncoding, callback: () => void) {
         process.nextTick(() => {
             if(this.logCallback) {
                 this.logCallback(dataset)
@@ -122,17 +73,21 @@ class Logger extends Writable<PointedNode> {
 
 export async function runPipeline(log: (observerStatus: ObservableStatus) => void, ingester: (ds: DatasetCore) => void) {
     const type = 'event'
-    const classIri = makeClassNode(type),
+    /*const classIri = makeClassNode(type),
         prefixes_string_only: Prefixes<string> = {
             mpp: propsIRI,
             mpe: entityIRI,
             mpc: classIRI
         }
+
+     const neo4jWriter = new Neo4JCypherWriter(classIri.value, prefixes_string_only, 'bolt://localhost:7687' )
+    const virtuosoWriter = new SparqlUpdateWriter('http://localhost:9999/blazegraph/namespace/kb/sparql', classIri.value, prefixes_string_only )
+
+     */
+    const client: Client = new Client({node: 'http://localhost:9200'})
     const { count } = await client.count({index: type})
-    const events = new EntityReader<Event>(type, {index: 'input', log})
+    const events = new EntityReader<Event>(type, {index: 'input', log}, client)
     const rdfizer = new EntityToRDFTransform<Event>(eventToRDF, {index: 'toRDF', log})
-    //  const neo4jWriter = new Neo4JCypherWriter(classIri.value, prefixes_string_only, 'bolt://localhost:7687' )
-    // const virtuosoWriter = new SparqlUpdateWriter('http://localhost:9999/blazegraph/namespace/kb/sparql', classIri.value, prefixes_string_only )
     const logger = new Logger(ingester)
 
     const progStream = (index: string, log: (observerStatus: ObservableStatus) => void) => {

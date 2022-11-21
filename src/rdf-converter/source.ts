@@ -1,14 +1,14 @@
-import {DatasetCore, Quad} from "@rdfjs/types";
-import {makeEntityNode, makePropertyNode} from "./vocabulary";
 import df from "@rdfjs/data-model";
+import {DatasetCore, Quad} from "@rdfjs/types";
 import {rdfs, xsd} from "@tpluscode/rdf-ns-builders";
+
+import {Source} from "../types/source";
 import {
-    addDefaultSimpleEdge,
     addEdgeWithReifiedProperties,
     addNamedSimpleEdge, createRDFGraphFromRaw,
     propertyListToPredicateObjectList
 } from "./utils";
-import {Source} from "../types/source";
+import {makeEntityNode, makePropertyNode} from "./vocabulary";
 
 
 export type SourceS = Source["_source"]

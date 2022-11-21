@@ -6,7 +6,7 @@ export class Neo4JCypherStreamWriter extends Writable<string> {
         super({objectMode: true})
     }
 
-    _write(chunk: string, encoding: BufferEncoding, callback: Function) {
+    _write(chunk: string, encoding: BufferEncoding, callback: () => void) {
         process.nextTick(async () => {
             try {
                 await this.session.run(chunk)

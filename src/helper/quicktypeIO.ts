@@ -1,7 +1,8 @@
-import {
-    TargetLanguage, Options
-} from "quicktype-core";
 import fs from "fs";
+import {
+Options,
+    TargetLanguage} from "quicktype-core";
+
 import quicktypeJSON from "./quicktype";
 
 export async function quicktypeFromFile(targetLanguage: string | TargetLanguage, typeName: string, options: Partial<Options & {fileExtension: string, inputFile: string, outputFile: string}> = {}) {

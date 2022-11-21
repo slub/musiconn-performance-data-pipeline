@@ -1,3 +1,7 @@
+import df from "@rdfjs/data-model";
+import {DatasetCore, Quad} from "@rdfjs/types";
+import {rdfs, xsd} from "@tpluscode/rdf-ns-builders";
+
 import {Event, Gallery} from "../types/event";
 import {
     addDefaultSimpleEdge,
@@ -6,14 +10,11 @@ import {
     propertyListToPredicateObjectList,
     toLiteral
 } from "./utils";
-import {DatasetCore, Quad} from "@rdfjs/types";
 import {makeEntityNode, makePropertyNode} from "./vocabulary";
-import df from "@rdfjs/data-model";
-import {rdfs, xsd} from "@tpluscode/rdf-ns-builders";
 
 export function eventsSourceGalleryToRdf(gallery: Gallery) {
     const {id, source, ...rest} = gallery
-    return createRDFGraphFromRaw('Gallery', gallery.id, rest, ['thumbnail', 'image'])
+    return createRDFGraphFromRaw('Gallery', id, rest, ['thumbnail', 'image'])
 }
 
 export type EventS = Event["_source"]

@@ -1,30 +1,31 @@
+import {ProgressBar} from "ascii-progress";
 import * as fs from "fs";
+import {Prefixes} from "n3";
 import ndjson from "ndjson";
-import {EntityToRDFTransform} from "./stream/EntityToRDFTransform";
-import {Person} from "./types/person";
-import {personToRDF} from "./rdf-converter/person";
-import {eventToRDF} from "./rdf-converter/event";
-import {Location} from "./types/location";
-import {locationToRDF} from "./rdf-converter/location";
-import {Work} from "./types/work";
-import {workToRDF} from "./rdf-converter/work";
-import {Corporation} from "./types/corporation";
+import neo4j from "neo4j-driver";
+
+import {countFileLines} from "./helper/countFileLines";
+import {ObservableOptions, ObservableStatus} from "./helper/types";
 import {corporationToRDF} from "./rdf-converter/corporation";
-import {Subject} from "./types/subject";
-import {subjectToRDF} from "./rdf-converter/subject";
+import {eventToRDF} from "./rdf-converter/event";
+import {locationToRDF} from "./rdf-converter/location";
+import {personToRDF} from "./rdf-converter/person";
 import {seriesToRDF} from "./rdf-converter/series";
+import {sourceToRDF} from "./rdf-converter/source";
+import {subjectToRDF} from "./rdf-converter/subject";
+import {classIRI, entityIRI, propsIRI} from "./rdf-converter/vocabulary";
+import {workToRDF} from "./rdf-converter/work";
+import {EntityToRDFTransform} from "./stream/EntityToRDFTransform";
+import {Neo4JCypherStreamWriter} from "./stream/Neo4JCypherStreamWriter";
+import {RdfSubject2CypherTransformer} from "./stream/RdfSubject2CypherTransformer";
+import {Corporation} from "./types/corporation";
+import {Event} from "./types/event";
+import {Location} from "./types/location";
+import {Person} from "./types/person";
 import {Series} from "./types/series";
 import {Source} from "./types/source";
-import {Event} from "./types/event";
-import {sourceToRDF} from "./rdf-converter/source";
-import {Neo4JCypherStreamWriter} from "./stream/Neo4JCypherStreamWriter";
-import neo4j from "neo4j-driver";
-import {Prefixes} from "n3";
-import {classIRI, entityIRI, propsIRI} from "./rdf-converter/vocabulary";
-import {RdfSubject2CypherTransformer} from "./stream/RdfSubject2CypherTransformer";
-import {ObservableOptions, ObservableStatus} from "./helper/types";
-import {ProgressBar} from "ascii-progress";
-import {countFileLines} from "./helper/countFileLines";
+import {Subject} from "./types/subject";
+import {Work} from "./types/work";
 
 const typeSaveTransforms = {
     "person": (opts: Partial<ObservableOptions> = {}) => new EntityToRDFTransform<Person>(personToRDF, {index: "personToRDF", ...opts}),
@@ -69,7 +70,7 @@ export async function fromDumpToNeo4J(log: (observerStatus: ObservableStatus) =>
 }
 
 const main = async () => {
-    for (let _type of ['location', 'person', 'event', 'work', 'corporation', 'subject', 'series', 'source'] as TypeType[]) {
+    for (const _type of ['location', 'person', 'event', 'work', 'corporation', 'subject', 'series', 'source'] as TypeType[]) {
         const lineCount = await countFileLines(`${dumpDir}/${_type}_data.json`);
         console.log(`Starting ${_type} with ${lineCount} lines`)
         const bar = new ProgressBar({

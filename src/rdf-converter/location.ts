@@ -1,3 +1,8 @@
+import df from "@rdfjs/data-model";
+import {DatasetCore, Quad} from "@rdfjs/types";
+import {geo, rdf, rdfs, sf, xsd} from "@tpluscode/rdf-ns-builders";
+
+import {hashQuads} from "../helper/quadHashes";
 import {Location} from "../types/location";
 import {
     addDefaultSimpleEdge,
@@ -6,11 +11,7 @@ import {
     propertyListToPredicateObjectList, toGeoLiteral,
     toLiteral, toWKTLiteral
 } from "./utils";
-import {DatasetCore, Quad} from "@rdfjs/types";
-import {makeClassNode, makeEntityNode, makePropertyNode} from "./vocabulary";
-import df from "@rdfjs/data-model";
-import {geo, rdf, rdfs, sf, xsd} from "@tpluscode/rdf-ns-builders";
-import {hashQuads} from "../helper/quadHashes";
+import {makeEntityNode, makePropertyNode} from "./vocabulary";
 
 export type LocationS = Location["_source"]
 

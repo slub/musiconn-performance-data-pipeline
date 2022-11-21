@@ -1,15 +1,13 @@
-import {BlankNode, DatasetCore, Literal, NamedNode, Quad, Quad_Object, Quad_Subject} from "@rdfjs/types";
-import df from "@rdfjs/data-model";
-import {geo, rdf, rdfs, xsd} from "@tpluscode/rdf-ns-builders";
-import {makeClassNode, makeEntityNode, makePropertyNode} from "./vocabulary";
-import {PredicateObjectPair, PropertyList} from "./types";
-import {filterUndefOrNull} from "../helper/notEmpty";
-import clownface from "clownface";
 import * as RdfStatement from "@rdfine/rdf/lib/Statement";
-import {createHash, randomUUID} from "crypto";
-import {turtle} from "@tpluscode/rdf-string";
-import N3 from "n3";
+import df from "@rdfjs/data-model";
+import {BlankNode, DatasetCore, Literal, NamedNode, Quad} from "@rdfjs/types";
+import {geo, rdf, rdfs, xsd} from "@tpluscode/rdf-ns-builders";
+import clownface from "clownface";
+
+import {filterUndefOrNull} from "../helper/notEmpty";
 import {hashQuad} from "../helper/quadHashes";
+import {PredicateObjectPair, PropertyList} from "./types";
+import {makeClassNode, makeEntityNode, makePropertyNode} from "./vocabulary";
 
 /**
  * convert any JS primitive value to RDF Literal

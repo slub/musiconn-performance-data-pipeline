@@ -1,9 +1,10 @@
-import {Prefixes} from "n3";
-import {DatasetCore, Quad} from "@rdfjs/types";
-import {QueryResult, Session} from "neo4j-driver";
-import {rdf} from "@tpluscode/rdf-ns-builders";
 import df from "@rdfjs/data-model";
+import {DatasetCore, Quad} from "@rdfjs/types";
+import {rdf} from "@tpluscode/rdf-ns-builders";
 import {ProgressBar} from "ascii-progress";
+import {Prefixes} from "n3";
+import {QueryResult, Session} from "neo4j-driver";
+
 import {iriToPrefixed} from "../helper/iri";
 import {rdfNodeToCypherStatement} from "./buildCypherStatements";
 

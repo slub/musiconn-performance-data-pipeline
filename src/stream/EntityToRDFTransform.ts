@@ -1,11 +1,12 @@
-import {DatasetCore, Quad} from "@rdfjs/types";
 import {SearchHit} from "@elastic/elasticsearch/lib/api/types";
-import {Transform} from "stronger-typed-streams";
-import {ObservableOptions, PointedNode} from "../helper/types";
-import {TransformCallback} from "stream";
 import datasetFactory from "@rdfjs/dataset";
+import {DatasetCore, Quad} from "@rdfjs/types";
+import {TransformCallback} from "stream";
+import {Transform} from "stronger-typed-streams";
 
-type ToRDFFunction<T> = (entity: T, dataset: DatasetCore) => string
+import {ObservableOptions, PointedNode} from "../helper/types";
+
+type ToRDFFunction<T> = (_entity: T, _dataset: DatasetCore) => string
 export class EntityToRDFTransform<T extends SearchHit> extends Transform<T["_source"], PointedNode> {
     private toRdf: ToRDFFunction<T["_source"]> | undefined
     private entities: T[]  = []
