@@ -33,6 +33,12 @@ export function toWKTLiteral(coords: [number, number]) {
     return df.literal(`POINT(${coords[0]} ${coords[1]})`, geo.wktLiteral)
 }
 
+export function fromWKTLiteral(literal: Literal): [number, number] {
+    const match = literal.value.match(/POINT\((?<lon>\d+\.\d+) (?<lat>\d+\.\d+)\)/)
+    if (!match) throw new Error('Cannot parse WKT literal')
+    return [parseFloat(match.groups!.lon), parseFloat(match.groups!.lat)]
+}
+
 
 export async function all<T>(promises?: Promise<T>[]) {
     return promises ? await Promise.all(promises) : []
