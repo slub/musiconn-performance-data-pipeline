@@ -4,7 +4,6 @@ import * as RDF from "rdf-js";
 export function rdfLiteralToNative(literal: RDF.Literal): string | number | boolean | Date {
     switch (literal.datatype.value) {
         case rdf.langString.value:
-            return literal.value
         case xsd.string.value:
             return literal.value
         case xsd.boolean.value:
