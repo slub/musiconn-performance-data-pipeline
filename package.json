@@ -25,13 +25,15 @@
     "build:cypher:subject": "ts-node ./src/rdfToCypher.ts -o ./data/cypher -t subject -i ./data/rdf/subject.ttl",
     "build:cypher:work": "ts-node ./src/rdfToCypher.ts -o ./data/cypher -t work -i ./data/rdf/work.ttl",
     "build:cypher:series": "ts-node ./src/rdfToCypher.ts -o ./data/cypher -t series -i ./data/rdf/series.ttl",
-    "pipeline:dump2neo4j": "ts-node ./src/dumpToNeo4j.ts",
+    "pipeline:dump2neo4j": "ts-node ./src/fromDumpToNeo4J.ts",
+    "doc:jsonschema": "mkdir -p docs/jsonschema && jsonschema2md -o docs/jsonschema -e json -d data/schema/",
     "fix:rdf": "sh ./scripts/fix_ttl_files.sh ./data/rdf ./data/fixed",
     "lint": "eslint . --ext .ts"
   },
   "author": "Sebastian Tilsch <sebastian-tilsch@slub-dresden.de>",
   "license": "MIT",
   "dependencies": {
+    "@adobe/jsonschema2md": "^7.1.3",
     "@asgerf/strongcli": "^0.3.0",
     "@elastic/elasticsearch": "^8.4.0",
     "@rdfine/rdf": "^0.5.7",
