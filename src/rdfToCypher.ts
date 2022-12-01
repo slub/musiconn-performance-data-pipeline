@@ -40,7 +40,7 @@ const {options} = cli.main<Options>({
 const {outputDir, inputFile, type} = options
 
 /**
- * iterate through all entities of a class and convert all literal proprties to a
+ * iterate through all entities of a class and convert all literal properties to a
  * cypher statement that creates a node with all properties
  */
 export function allInstancesOfClassToCypherStatements(classIRI: string, prefixes: Prefixes<string>, dataset: DatasetCore<Quad>): string[] {
