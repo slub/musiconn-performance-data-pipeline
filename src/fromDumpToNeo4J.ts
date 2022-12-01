@@ -49,7 +49,7 @@ export async function fromDumpToNeo4J(log: (observerStatus: ObservableStatus) =>
             mpe: entityIRI,
             mpc: classIRI
         },
-        driver = neo4j.driver(database),
+        driver = process.env.NEO4J_NOAUTH ? neo4j.driver(database) : neo4j.driver(database, neo4j.auth.basic(process.env.NEO4J_USER || "neo4j" , process.env.NEO4J_PASSWORD || "neo4j")),
         session = driver.session(),
         rdfizer = typeSaveTransforms[type]({log}),
         cypherer = new RdfSubject2CypherTransformer(prefixes_string_only),
@@ -70,7 +70,7 @@ export async function fromDumpToNeo4J(log: (observerStatus: ObservableStatus) =>
 }
 
 const main = async () => {
-    for (const _type of ['location', 'person', 'event', 'work', 'corporation', 'subject', 'series', 'source'] as TypeType[]) {
+    for (const _type of ['event', 'work', 'corporation', 'subject', 'series', 'source'] as TypeType[]) {
         const lineCount = await countFileLines(`${dumpDir}/${_type}_data.json`);
         console.log(`Starting ${_type} with ${lineCount} lines`)
         const bar = new ProgressBar({
