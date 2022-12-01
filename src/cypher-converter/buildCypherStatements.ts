@@ -8,6 +8,7 @@ import * as RDF from "rdf-js";
 import {iriToPrefixed} from "../helper/iri";
 import {filterUndefOrNull} from "../helper/notEmpty";
 import {getReifiedStatementTerms} from "../helper/reification";
+import {getLiteralProperties} from "../helper/dataset";
 
 
 function rdfLiteralToNeo4JLiteral(literal: RDF.Literal): string {
@@ -37,18 +38,7 @@ function rdfLiteralToNeo4JLiteral(literal: RDF.Literal): string {
 export function rdfNodeToCypherStatement(tempNodeVariable: string, neo4jType: string, node: RDF.NamedNode, prefixes: Prefixes<string>, dataset: DatasetCore<Quad>): string[] {
     const statements = []
     statements.push(`MERGE (${tempNodeVariable}:${neo4jType} {id: "${node.value}"})`)
-    const properties: { key: string, value: RDF.Literal }[] = filterUndefOrNull(Array.from(dataset.match(node, null, null))
-        .map(({
-                  predicate,
-                  object
-              }) => {
-            if (object.termType === 'Literal') {
-                const key = iriToPrefixed(predicate.value, prefixes)?.[1]
-                if(!key) return null
-                return {key, value: object}
-            }
-            return null
-        }))
+    const properties: { key: string, value: RDF.Literal }[] = getLiteralProperties(node, dataset, prefixes)
     statements.push('SET')
     properties.map(({key, value}, index) => {
         const cypherValue = rdfLiteralToNeo4JLiteral(value)
@@ -64,19 +54,8 @@ export function rdfNodeToCypherStatement(tempNodeVariable: string, neo4jType: st
                     const edgeType = iriToPrefixed(predicate.value, prefixes)?.[1]
                     if(!edgeType) return null
 
-                    const reifiedTerms = getReifiedStatementTerms(df.quad(node, predicate, object), dataset)
-                    const edgeProperties: { key: string, value: RDF.Literal }[] = flatten(reifiedTerms.map((subject) => {
-                        const properties = Array.from(dataset.match(subject, null, null))
-                        console.log('edge properties', properties)
-                        return filterUndefOrNull(properties.map(({predicate, object}) => {
-                            if (object.termType === 'Literal') {
-                                const  key = iriToPrefixed(predicate.value, prefixes)?.[1]
-                                if(!key) return null
-                                return {key, value: object}
-                            }
-                            return null
-                        }))
-                    }))
+                    const reifiedStatements = getReifiedStatementTerms(df.quad(node, predicate, object), dataset)
+                    const edgeProperties = flatten(reifiedStatements.map(statement => getLiteralProperties(statement as (RDF.NamedNode | RDF.BlankNode), dataset, prefixes)))
                     return {edgeType, edgeProperties, targetId: object.value}
                 }
                 return null
